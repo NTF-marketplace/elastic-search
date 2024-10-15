@@ -1,0 +1,1 @@
+GRANT ALL PRIVILEGES ON DATABASE elastic_search TO elastic_search;
