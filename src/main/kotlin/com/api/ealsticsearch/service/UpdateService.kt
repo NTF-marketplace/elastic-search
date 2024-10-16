@@ -13,10 +13,9 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.time.format.DateTimeFormatter
 
 @Service
-class ElasticsearchService(
+class UpdateService(
     private val client: ElasticsearchClient,
     private val redisService: RedisService,
 ) {

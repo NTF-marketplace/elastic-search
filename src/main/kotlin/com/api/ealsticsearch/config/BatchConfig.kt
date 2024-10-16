@@ -1,7 +1,7 @@
 package com.api.ealsticsearch.config
 
 import com.api.ealsticsearch.enums.AGGREGATIONS_TYPE
-import com.api.ealsticsearch.service.ElasticSearchRankService
+import com.api.ealsticsearch.service.RankService
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobParametersBuilder
 import org.springframework.batch.core.Step
@@ -23,7 +23,7 @@ import reactor.core.publisher.Mono
 @Configuration
 @EnableBatchProcessing
 class BatchConfig(
-    private val elasticSearchRankService: ElasticSearchRankService,
+    private val rankService: RankService,
     private val jobRepository: JobRepository,
     private val transactionManager: PlatformTransactionManager
 ) {
@@ -64,17 +64,17 @@ class BatchConfig(
 
     private fun runBatch() {
         println("Running batch job...")
-        val oneHour = elasticSearchRankService.updateRanking(AGGREGATIONS_TYPE.ONE_HOURS, 30)
-            .flatMap { elasticSearchRankService.saveRankings(it) }
+        val oneHour = rankService.updateRanking(AGGREGATIONS_TYPE.ONE_HOURS, 30)
+            .flatMap { rankService.saveRankings(it) }
 
-        val sixHours = elasticSearchRankService.updateRanking(AGGREGATIONS_TYPE.SIX_HOURS, 30)
-            .flatMap { elasticSearchRankService.saveRankings(it) }
+        val sixHours = rankService.updateRanking(AGGREGATIONS_TYPE.SIX_HOURS, 30)
+            .flatMap { rankService.saveRankings(it) }
 
-        val oneDay = elasticSearchRankService.updateRanking(AGGREGATIONS_TYPE.ONE_DAY, 30)
-            .flatMap { elasticSearchRankService.saveRankings(it) }
+        val oneDay = rankService.updateRanking(AGGREGATIONS_TYPE.ONE_DAY, 30)
+            .flatMap { rankService.saveRankings(it) }
 
-        val sevenDays = elasticSearchRankService.updateRanking(AGGREGATIONS_TYPE.SEVEN_DAY, 30)
-            .flatMap { elasticSearchRankService.saveRankings(it) }
+        val sevenDays = rankService.updateRanking(AGGREGATIONS_TYPE.SEVEN_DAY, 30)
+            .flatMap { rankService.saveRankings(it) }
 
         Mono.`when`(oneHour, sixHours, oneDay, sevenDays)
             .doOnSuccess { println("Batch job completed successfully.") }

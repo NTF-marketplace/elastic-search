@@ -8,6 +8,7 @@ import java.time.LocalDateTime
 data class NftDocument(
     val id: Long,
     val chainType: ChainType,
+    val image: String,
     val collectionName: String,
     val collectionLogo: String?,
     val lastPrice: BigDecimal?,

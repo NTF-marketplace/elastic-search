@@ -16,7 +16,7 @@ import java.time.Duration
 import java.time.Instant
 
 @Service
-class ElasticSearchRankService(
+class RankService(
     private val client: ElasticsearchClient,
 ) {
     fun extractAggregateValue(agg: Aggregate): Double {

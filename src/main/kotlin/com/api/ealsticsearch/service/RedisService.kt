@@ -20,6 +20,7 @@ class RedisService(
                 NftDocument(
                     id = nftMetadata.id,
                     chainType = nftMetadata.chainType,
+                    image = nftMetadata.image,
                     lastPrice = null,
                     collectionName = nftMetadata.collectionName,
                     collectionLogo = nftMetadata.collectionLogo,

@@ -1,21 +1,21 @@
 package com.api.ealsticsearch
 
 import com.api.ealsticsearch.enums.AGGREGATIONS_TYPE
-import com.api.ealsticsearch.service.ElasticSearchRankService
-import com.api.ealsticsearch.service.ElasticsearchService
+import com.api.ealsticsearch.service.RankService
+import com.api.ealsticsearch.service.UpdateService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import kotlin.test.Test
 
 @SpringBootTest
 class ElasticSearchTest(
-    @Autowired private val elasticsearchService: ElasticsearchService,
-    @Autowired private val elasticSearchRankService: ElasticSearchRankService
+    @Autowired private val updateService: UpdateService,
+    @Autowired private val rankService: RankService
 ) {
 
     @Test
     fun test() {
-        val list = elasticSearchRankService.updateRanking(AGGREGATIONS_TYPE.ONE_DAY).block()
+        val list = rankService.updateRanking(AGGREGATIONS_TYPE.ONE_DAY).block()
 
         println("Result Map: $list")
 
@@ -28,7 +28,7 @@ class ElasticSearchTest(
 
     @Test
     fun test1() {
-        val list = elasticSearchRankService.updateRanking12(AGGREGATIONS_TYPE.SEVEN_DAY).block()
+        val list = rankService.updateRanking12(AGGREGATIONS_TYPE.SEVEN_DAY).block()
 
         println("Result Map: $list")
 

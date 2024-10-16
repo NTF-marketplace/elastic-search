@@ -2,7 +2,7 @@ package com.api.ealsticsearch.kafka
 
 import com.api.ealsticsearch.enums.OrderType
 import com.api.ealsticsearch.enums.StatusType
-import com.api.ealsticsearch.service.ElasticsearchService
+import com.api.ealsticsearch.service.UpdateService
 import com.api.ealsticsearch.service.dto.LedgerResponse
 import com.api.ealsticsearch.service.dto.SaleResponse
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 @Service
 class KafkaConsumer(
     private val objectMapper: ObjectMapper,
-    private val elasticsearchService: ElasticsearchService,
+    private val updateService: UpdateService,
 ){
     @KafkaListener(topics = ["ledgerResponse-topic"],
         groupId = "elastic-group",
@@ -23,7 +23,7 @@ class KafkaConsumer(
 
         if (payload is LinkedHashMap<*, *>) {
             val response = objectMapper.convertValue(payload, LedgerResponse::class.java)
-            elasticsearchService.updateLedger(response)
+            updateService.updateLedger(response)
         }
     }
 
@@ -39,7 +39,7 @@ class KafkaConsumer(
             println("response : " + response.toString())
             val availableStatus = listOf(StatusType.ACTIVED,StatusType.LEDGER, StatusType.EXPIRED, StatusType.CANCEL)
             if(response.orderType == OrderType.LISTING && response.statusType in availableStatus){
-                elasticsearchService.updatePrice(response)
+                updateService.updatePrice(response)
             }
         }
     }
