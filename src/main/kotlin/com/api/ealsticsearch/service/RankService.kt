@@ -63,7 +63,7 @@ class RankService(
     }
 
 
-    fun updateRanking12(type: AGGREGATIONS_TYPE, limit: Int = 10): Mono<MutableMap<AGGREGATIONS_TYPE, List<RankDocument>>> {
+    fun updateRanking(type: AGGREGATIONS_TYPE, limit: Int = 10): Mono<MutableMap<AGGREGATIONS_TYPE, List<RankDocument>>> {
         return Mono.defer {
             val startTimeMillis = toTimestamp(type)
             println("Start time: $startTimeMillis")
@@ -141,53 +141,53 @@ class RankService(
             .then()
     }
 
-    fun updateRanking(type: AGGREGATIONS_TYPE, limit: Int = 10): Mono<MutableMap<AGGREGATIONS_TYPE, List<RankDocument>>> {
-        return Mono.defer {
-            val startTimeMillis = toTimestamp(type)
-
-            val rangeQuery = RangeQuery.of { r ->
-                r.field("ledgerTime")
-                    .gte(JsonData.of(startTimeMillis))
-            }
-
-            Mono.fromCallable {
-                val searchResponse = client.search({ search ->
-                    search.index("nfts")
-                        .query { q -> q.range(rangeQuery) }
-                }, Document::class.java)
-
-                val documents = searchResponse.hits().hits().mapNotNull { it.source() }
-                val rankings = groupAndAggregateResults(documents, type, limit)
-                mutableMapOf(type to rankings)
-            }
-        }
-    }
-
-    private fun groupAndAggregateResults(
-        documents: List<Document>,
-        type: AGGREGATIONS_TYPE,
-        limit: Int
-    ): List<RankDocument> {
-        val groupedByCollection = documents.groupBy { it.collectionName to it.chainType }
-
-        return groupedByCollection.map { (key, docs) ->
-            val (collectionName, chainType) = key
-            val totalPrice = docs.sumOf { it.ledgerPrice ?: 0.0 }
-            val lowPrice = docs.mapNotNull { it.lastPrice }
-                .minOrNull() ?: 0.0
-            val highPrice = docs.mapNotNull { it.lastPrice }
-                .maxOrNull() ?: 0.0
-
-            RankDocument(
-                collectionName = collectionName,
-                chainType = chainType,
-                totalPrice = totalPrice,
-                lowPrice = lowPrice,
-                highPrice = highPrice,
-                timeRange = type
-            )
-        }.sortedByDescending { it.totalPrice }.take(limit)
-    }
+    // fun updateRanking(type: AGGREGATIONS_TYPE, limit: Int = 10): Mono<MutableMap<AGGREGATIONS_TYPE, List<RankDocument>>> {
+    //     return Mono.defer {
+    //         val startTimeMillis = toTimestamp(type)
+    //
+    //         val rangeQuery = RangeQuery.of { r ->
+    //             r.field("ledgerTime")
+    //                 .gte(JsonData.of(startTimeMillis))
+    //         }
+    //
+    //         Mono.fromCallable {
+    //             val searchResponse = client.search({ search ->
+    //                 search.index("nfts")
+    //                     .query { q -> q.range(rangeQuery) }
+    //             }, Document::class.java)
+    //
+    //             val documents = searchResponse.hits().hits().mapNotNull { it.source() }
+    //             val rankings = groupAndAggregateResults(documents, type, limit)
+    //             mutableMapOf(type to rankings)
+    //         }
+    //     }
+    // }
+    //
+    // private fun groupAndAggregateResults(
+    //     documents: List<Document>,
+    //     type: AGGREGATIONS_TYPE,
+    //     limit: Int
+    // ): List<RankDocument> {
+    //     val groupedByCollection = documents.groupBy { it.collectionName to it.chainType }
+    //
+    //     return groupedByCollection.map { (key, docs) ->
+    //         val (collectionName, chainType) = key
+    //         val totalPrice = docs.sumOf { it.ledgerPrice ?: 0.0 }
+    //         val lowPrice = docs.mapNotNull { it.lastPrice }
+    //             .minOrNull() ?: 0.0
+    //         val highPrice = docs.mapNotNull { it.lastPrice }
+    //             .maxOrNull() ?: 0.0
+    //
+    //         RankDocument(
+    //             collectionName = collectionName,
+    //             chainType = chainType,
+    //             totalPrice = totalPrice,
+    //             lowPrice = lowPrice,
+    //             highPrice = highPrice,
+    //             timeRange = type
+    //         )
+    //     }.sortedByDescending { it.totalPrice }.take(limit)
+    // }
 
 
     private fun toTimestamp(aggregationType: AGGREGATIONS_TYPE): Long {
