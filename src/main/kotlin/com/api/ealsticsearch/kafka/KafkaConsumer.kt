@@ -23,7 +23,7 @@ class KafkaConsumer(
 
         if (payload is LinkedHashMap<*, *>) {
             val response = objectMapper.convertValue(payload, LedgerResponse::class.java)
-            updateService.updateLedger(response)
+            updateService.updateLedger(response).subscribe()
         }
     }
 
@@ -39,7 +39,7 @@ class KafkaConsumer(
             println("response : " + response.toString())
             val availableStatus = listOf(StatusType.ACTIVED,StatusType.LEDGER, StatusType.EXPIRED, StatusType.CANCEL)
             if(response.orderType == OrderType.LISTING && response.statusType in availableStatus){
-                updateService.updatePrice(response)
+                updateService.updatePrice(response).subscribe()
             }
         }
     }
